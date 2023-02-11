@@ -2,7 +2,7 @@ import logging
 import os
 
 from dotenv import load_dotenv
-from revChatGPT.revChatGPT import AsyncChatbot as ChatGPT3Bot
+from revChatGPT.Proxied import Chatbot
 
 from telegram_bot import ChatGPT3TelegramBot
 
@@ -41,7 +41,8 @@ def main():
     debug = os.environ.get('DEBUG', 'true').lower() == 'true'
 
     # Setup and run ChatGPT and Telegram bot
-    gpt3_bot = ChatGPT3Bot(config=chatgpt_config, debug=debug)
+    # gpt3_bot = ChatGPT3Bot(config=chatgpt_config, debug=debug)
+    gpt3_bot = Chatbot(config=chatgpt_config)
     telegram_bot = ChatGPT3TelegramBot(config=telegram_config, gpt3_bot=gpt3_bot)
     telegram_bot.run()
 

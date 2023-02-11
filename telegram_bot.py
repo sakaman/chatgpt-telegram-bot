@@ -3,7 +3,7 @@ import logging
 
 import telegram.constants as constants
 from httpx import HTTPError
-from revChatGPT.revChatGPT import AsyncChatbot as ChatGPT3Bot
+from revChatGPT.Proxied import Chatbot
 from telegram import Update, Message
 from telegram.error import RetryAfter, BadRequest
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, MessageHandler, filters
@@ -14,7 +14,7 @@ class ChatGPT3TelegramBot:
     Class representing a Chat-GPT3 Telegram Bot.
     """
 
-    def __init__(self, config: dict, gpt3_bot: ChatGPT3Bot):
+    def __init__(self, config: dict, gpt3_bot: Chatbot):
         """
         Initializes the bot with the given configuration and GPT-3 bot object.
         :param config: A dictionary containing the bot configuration
@@ -109,7 +109,8 @@ class ChatGPT3TelegramBot:
             message_update_task = context.application.create_task(message_update(every_seconds=0.5))
 
             # Stream the response
-            async for chunk in await self.gpt3_bot.get_chat_response(update.message.text, output='stream'):
+            # async for chunk in await self.gpt3_bot.get_chat_response(update.message.text, output='stream'):
+            async for chunk in await self.gpt3_bot.ask(update.message.text):
                 if chunk_index == 0 and initial_message is None:
                     # Sends the initial message, to be edited later with updated text
                     initial_message = await context.bot.send_message(
@@ -141,7 +142,7 @@ class ChatGPT3TelegramBot:
         Gets the response from the ChatGPT APIs.
         """
         try:
-            response = await self.gpt3_bot.get_chat_response(message)
+            response = await self.gpt3_bot.ask(message)
             return response
         except Exception as e:
             logging.info(f'Error while getting the response: {str(e)}')
